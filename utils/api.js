@@ -1,14 +1,21 @@
-export const uploadVideo = async (video, audio = null, artist) => {
-  const form = new FormData();
-  form.append("video", video);
-  if (audio) form.append("audio", audio);
-  form.append("artist", artist);
+export const generateCaptions = async (clipId) => {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_GATEWAY_URL}/captions/generate`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ clipId }),
+    }
+  );
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_GATEWAY_URL}/upload`, {
-    method: "POST",
-    body: form,
-  });
+  if (!res.ok) throw new Error("Caption generation failed.");
+  return await res.json();
+};
 
-  if (!res.ok) throw new Error("Upload failed.");
+export const getCaptions = async (clipId) => {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_GATEWAY_URL}/captions/${clipId}`
+  );
+  if (!res.ok) return null;
   return await res.json();
 };
