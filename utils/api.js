@@ -45,4 +45,17 @@ export const publishToPlatform = async (clipId, platform, artist) => {
   if (!res.ok) throw new Error("Publishing failed.");
   return await res.json();
 };
+export const saveArtistSettings = async (artist, settings) => {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_GATEWAY_URL}/artists/settings`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ artist, ...settings }),
+    }
+  );
+
+  if (!res.ok) throw new Error("Unable to save artist settings.");
+  return await res.json();
+};
 
