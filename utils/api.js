@@ -32,3 +32,17 @@ export const generateArtwork = async (clipId, artist) => {
   if (!res.ok) throw new Error("Artwork generation failed.");
   return await res.json();
 };
+export const publishToPlatform = async (clipId, platform, artist) => {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_GATEWAY_URL}/publish/${platform}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ clipId, artist }),
+    }
+  );
+
+  if (!res.ok) throw new Error("Publishing failed.");
+  return await res.json();
+};
+
