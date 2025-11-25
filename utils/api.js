@@ -19,3 +19,16 @@ export const getCaptions = async (clipId) => {
   if (!res.ok) return null;
   return await res.json();
 };
+export const generateArtwork = async (clipId, artist) => {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_GATEWAY_URL}/artwork/generate`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ clipId, artist }),
+    }
+  );
+
+  if (!res.ok) throw new Error("Artwork generation failed.");
+  return await res.json();
+};
