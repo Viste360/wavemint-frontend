@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Load token on first render
+  // load on mount
   useEffect(() => {
     const storedToken = localStorage.getItem("wavemint_token");
     const storedUser = localStorage.getItem("wavemint_user");
@@ -26,38 +26,32 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (email, password) => {
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_GATEWAY_URL}/auth/login`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
-        }
-      );
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_GATEWAY_URL}/auth/login`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      }
+    );
 
-      const data = await res.json();
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Login failed");
 
-      if (!res.ok) throw new Error(data.error || "Login failed");
+    localStorage.setItem("wavemint_token", data.token);
+    localStorage.setItem("wavemint_user", JSON.stringify(data.user));
 
-      localStorage.setItem("wavemint_token", data.token);
-      localStorage.setItem("wavemint_user", JSON.stringify(data.user));
+    setToken(data.token);
+    setUser(data.user);
 
-      setToken(data.token);
-      setUser(data.user);
-
-      router.push("/dashboard");
-    } catch (err) {
-      console.error("Auth error:", err);
-      throw err;
-    }
+    router.push("/dashboard");
   };
 
   const logout = () => {
     localStorage.removeItem("wavemint_token");
     localStorage.removeItem("wavemint_user");
-    setUser(null);
     setToken(null);
+    setUser(null);
     router.push("/login");
   };
 
@@ -69,3 +63,4 @@ export const AuthProvider = ({ children }) => {
 };
 
 export const useAuth = () => useContext(AuthContext);
+
