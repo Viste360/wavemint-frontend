@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Sidebar from "@/components/Sidebar";
@@ -11,7 +13,7 @@ import { publishToPlatform } from "@/utils/api";
 
 export default function PublishPage() {
   const { id } = useParams();
-  const { currentArtist } = useArtist();
+  const { currentArtist } = useArtist() || {};
 
   const [clip, setClip] = useState(null);
   const [statuses, setStatuses] = useState({});
@@ -20,16 +22,21 @@ export default function PublishPage() {
   const platforms = ["tiktok", "instagram", "youtube", "facebook", "x"];
 
   useEffect(() => {
+    if (!id) return;
     loadClip();
     loadStatuses();
-  }, []);
+  }, [id]);
 
   const loadClip = async () => {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_GATEWAY_URL}/clips/${id}`
-    );
-    const data = await res.json();
-    setClip(data);
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_GATEWAY_URL}/clips/${id}`
+      );
+      const data = await res.json();
+      setClip(data);
+    } catch (err) {
+      console.error("Failed to load clip", err);
+    }
   };
 
   const loadStatuses = async () => {
@@ -46,6 +53,8 @@ export default function PublishPage() {
   };
 
   const handlePublish = async (platform) => {
+    if (!currentArtist?.slug) return;
+
     const result = await publishToPlatform(id, platform, currentArtist.slug);
 
     setStatuses((prev) => ({
@@ -75,7 +84,7 @@ export default function PublishPage() {
       <main className="ml-60 mt-16 p-8 text-white">
         <h1
           className="text-4xl font-bold mb-6"
-          style={{ color: currentArtist.color }}
+          style={{ color: currentArtist?.color || "white" }}
         >
           Publish Clip
         </h1>
