@@ -8,6 +8,9 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  // 🔍 TEMPORARY DEBUG LINE → shows if env var is loaded correctly
+  console.log("GW:", process.env.NEXT_PUBLIC_GATEWAY_URL);
+
   const submit = async (e) => {
     e.preventDefault();
     await login(email, password);
