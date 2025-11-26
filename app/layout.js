@@ -1,13 +1,22 @@
-export const dynamic = "force-dynamic";
-export const fetchCache = "force-no-store";
-export const revalidate = 0;
+import './globals.css';
+import { ArtistProvider } from "@/context/ArtistContext";
+import { AuthProvider } from "@/context/AuthContext";
 
-import "./globals.css";
+export const metadata = {
+  title: "Wavemint",
+  description: "AI-powered clip generator",
+};
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <AuthProvider>
+          <ArtistProvider>
+            {children}
+          </ArtistProvider>
+        </AuthProvider>
+      </body>
     </html>
   );
 }
