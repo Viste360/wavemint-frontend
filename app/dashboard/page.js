@@ -1,4 +1,5 @@
 "use client";
+export const dynamic = "force-dynamic";
 
 import ProtectedPage from "@/components/ProtectedPage";
 import Sidebar from "@/components/Sidebar";
@@ -7,6 +8,9 @@ import { useArtist } from "@/context/ArtistContext";
 
 export default function Dashboard() {
   const { currentArtist } = useArtist();
+
+  // Prevent rendering until context is ready
+  if (!currentArtist) return null;
 
   return (
     <ProtectedPage>
