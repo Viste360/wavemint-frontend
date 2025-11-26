@@ -1,9 +1,8 @@
-import './globals.css';
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
+export const revalidate = 0;
 
-export const metadata = {
-  title: "Wavemint",
-  description: "AI-powered clip generator",
-};
+import "./globals.css";
 
 export default function RootLayout({ children }) {
   return (
