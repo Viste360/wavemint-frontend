@@ -1,10 +1,13 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login } = useAuth() || {};  // safe fallback
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -14,11 +17,14 @@ export default function LoginPage() {
     e.preventDefault();
     setError(null);
     setLoading(true);
+
     try {
+      if (!login) throw new Error("Auth system not ready.");
       await login(email, password);
     } catch (err) {
       setError(err.message);
     }
+
     setLoading(false);
   };
 
