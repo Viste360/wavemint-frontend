@@ -8,34 +8,33 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const submit = async (e) => {
+  async function submit(e) {
     e.preventDefault();
     await login(email, password);
-  };
+  }
 
   return (
-    <div className="h-screen flex items-center justify-center bg-black">
-      <div className="p-10 rounded-2xl bg-neutral-900/60 backdrop-blur-xl shadow-2xl border border-neutral-800 w-[360px]">
-        
+    <div className="h-screen bg-black flex items-center justify-center">
+      <div className="
+        w-[380px] p-10 rounded-2xl
+        bg-neutral-900/70
+        backdrop-blur-xl
+        shadow-[0_0_30px_#0ffff033]
+        border border-neutral-800
+      ">
+
+        {/* Logo */}
         <div className="flex flex-col items-center mb-8">
-          <svg width="160" height="45" viewBox="0 0 350 80">
-            <path d="M5 40 Q25 10 45 40 T85 40 T125 40 T165 40 T205 40"
-                  stroke="#0FFFF0" strokeWidth="4" fill="none"
-                  strokeLinecap="round" strokeLinejoin="round">
-              <animate attributeName="stroke-opacity"
-                       values="0.1;1;0.1"
-                       dur="2s"
-                       repeatCount="indefinite" />
-            </path>
-          </svg>
-          <h2 className="text-white text-xl font-semibold mt-2 tracking-widest">
+          <img src="/logo.svg" className="w-44 opacity-90" />
+          <h2 className="text-white text-xl font-semibold mt-4 tracking-wider">
             Sign In
           </h2>
         </div>
 
-        <form onSubmit={submit} className="flex flex-col gap-4">
+        <form onSubmit={submit} className="flex flex-col gap-5">
+
           <input
-            className="p-3 rounded bg-neutral-800 text-white outline-none border border-neutral-700 focus:border-[#0FFFF0]"
+            className="p-3 rounded bg-neutral-800 text-white border border-neutral-700 focus:border-[#0FFFF0] outline-none"
             placeholder="Email"
             value={email}
             onChange={e => setEmail(e.target.value)}
@@ -43,19 +42,19 @@ export default function LoginPage() {
 
           <input
             type="password"
-            className="p-3 rounded bg-neutral-800 text-white outline-none border border-neutral-700 focus:border-[#0FFFF0]"
+            className="p-3 rounded bg-neutral-800 text-white border border-neutral-700 focus:border-[#0FFFF0] outline-none"
             placeholder="Password"
             value={password}
             onChange={e => setPassword(e.target.value)}
           />
 
           <button
-            className="p-3 mt-4 rounded bg-[#0FFFF0] text-black font-bold hover:opacity-90 transition"
+            className="p-3 mt-2 rounded bg-[#0FFFF0] text-black font-bold hover:opacity-90 transition"
           >
             Login
           </button>
-        </form>
 
+        </form>
       </div>
     </div>
   );
