@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // load on mount
+  // Load stored auth on mount
   useEffect(() => {
     const storedToken = localStorage.getItem("wavemint_token");
     const storedUser = localStorage.getItem("wavemint_user");
@@ -36,8 +36,10 @@ export const AuthProvider = ({ children }) => {
     );
 
     const data = await res.json();
+
     if (!res.ok) throw new Error(data.error || "Login failed");
 
+    // 🔥 Save role + token
     localStorage.setItem("wavemint_token", data.token);
     localStorage.setItem("wavemint_user", JSON.stringify(data.user));
 
@@ -56,11 +58,19 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, loading }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        role: user?.role || "user",
+        login,
+        logout,
+        loading,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
 export const useAuth = () => useContext(AuthContext);
-
