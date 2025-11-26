@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useState, useEffect } from "react";
 import Sidebar from "@/components/Sidebar";
 import Topbar from "@/components/Topbar";
@@ -10,7 +12,7 @@ import { saveArtistSettings } from "@/utils/api";
 import artists from "@/data/artists";
 
 export default function SettingsPage() {
-  const { currentArtist, switchArtist } = useArtist();
+  const { currentArtist, switchArtist } = useArtist() || {};
 
   const [tokens, setTokens] = useState({
     tiktok: "",
@@ -23,20 +25,26 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    // load existing settings
+    if (!currentArtist?.slug) return;
+
     const load = async () => {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_GATEWAY_URL}/artists/settings/${currentArtist.slug}`
-      );
-      const data = await res.json();
-      if (data && data.tokens) {
-        setTokens(data.tokens);
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_GATEWAY_URL}/artists/settings/${currentArtist.slug}`
+        );
+        const data = await res.json();
+        if (data?.tokens) setTokens(data.tokens);
+      } catch (err) {
+        console.error("Error loading settings", err);
       }
     };
+
     load();
-  }, [currentArtist.slug]);
+  }, [currentArtist?.slug]);
 
   const save = async () => {
+    if (!currentArtist?.slug) return;
+
     setSaving(true);
     await saveArtistSettings(currentArtist.slug, { tokens });
     setSaving(false);
@@ -50,17 +58,18 @@ export default function SettingsPage() {
       <main className="ml-60 mt-16 p-10 text-white">
         <h1
           className="text-4xl font-bold mb-8"
-          style={{ color: currentArtist.color }}
+          style={{ color: currentArtist?.color || "white" }}
         >
           Artist Settings
         </h1>
 
         <div className="bg-neutral-900 p-6 rounded-xl border border-neutral-700 mb-10">
           <h2 className="text-xl font-semibold mb-4">Change Artist</h2>
+
           <select
             className="p-3 bg-neutral-800 border border-neutral-700 rounded text-white"
-            value={currentArtist.slug}
-            onChange={(e) => switchArtist(e.target.value)}
+            value={currentArtist?.slug || ""}
+            onChange={(e) => switchArtist?.(e.target.value)}
           >
             {artists.map((a) => (
               <option key={a.slug} value={a.slug}>
@@ -75,35 +84,30 @@ export default function SettingsPage() {
 
           <SettingsPlatformInput
             label="TikTok Access Token"
-            placeholder="Paste TikTok token"
             value={tokens.tiktok}
             onChange={(v) => setTokens({ ...tokens, tiktok: v })}
           />
 
           <SettingsPlatformInput
             label="Instagram Access Token"
-            placeholder="Paste Instagram token"
             value={tokens.instagram}
             onChange={(v) => setTokens({ ...tokens, instagram: v })}
           />
 
           <SettingsPlatformInput
             label="YouTube API Key"
-            placeholder="Paste YouTube API key"
             value={tokens.youtube}
             onChange={(v) => setTokens({ ...tokens, youtube: v })}
           />
 
           <SettingsPlatformInput
             label="Facebook Page Token"
-            placeholder="Paste Facebook token"
             value={tokens.facebook}
             onChange={(v) => setTokens({ ...tokens, facebook: v })}
           />
 
           <SettingsPlatformInput
             label="X (Twitter) Token"
-            placeholder="Paste X API token"
             value={tokens.x}
             onChange={(v) => setTokens({ ...tokens, x: v })}
           />
