@@ -1,89 +1,80 @@
-// utils/api.js
+"use client";
 
-// ---------------- CAPTIONS ----------------
+export const dynamic = "force-dynamic";
 
-export const generateCaptions = async (clipId) => {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_GATEWAY_URL}/captions/generate`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ clipId }),
+import { useState } from "react";
+import Sidebar from "@/components/Sidebar";
+import Topbar from "@/components/Topbar";
+import ProtectedPage from "@/components/ProtectedPage";
+import UploadDropzone from "@/components/UploadDropzone";
+import { useArtist } from "@/context/ArtistContext";
+import { uploadVideo } from "@/utils/api";
+
+export default function UploadPage() {
+  const { currentArtist } = useArtist() || {};
+  const [files, setFiles] = useState({ video: null, audio: null });
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState("");
+
+  const submit = async () => {
+    if (!files.video) {
+      alert("Please upload a video.");
+      return;
     }
-  );
 
-  if (!res.ok) throw new Error("Caption generation failed.");
-  return await res.json();
-};
-
-export const getCaptions = async (clipId) => {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_GATEWAY_URL}/captions/${clipId}`
-  );
-
-  if (!res.ok) return null;
-  return await res.json();
-};
-
-// ---------------- ARTWORK ----------------
-
-export const generateArtwork = async (clipId, artist) => {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_GATEWAY_URL}/artwork/generate`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ clipId, artist }),
+    if (!currentArtist?.slug) {
+      alert("Artist not ready.");
+      return;
     }
-  );
 
-  if (!res.ok) throw new Error("Artwork generation failed.");
-  return await res.json();
-};
+    setLoading(true);
+    setStatus("Uploading...");
 
-// ---------------- PUBLISHING ----------------
+    try {
+      // 🔥 Build FormData correctly
+      const formData = new FormData();
+      formData.append("video", files.video);
+      if (files.audio) formData.append("audio", files.audio);
+      formData.append("artist", currentArtist.slug);
 
-export const publishToPlatform = async (clipId, platform, artist) => {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_GATEWAY_URL}/publish/${platform}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ clipId, artist }),
+      const res = await uploadVideo(formData);
+
+      setStatus("Processing...");
+      console.log("Upload success:", res);
+
+      // Later: router.push(`/clips/${res.jobId}`);
+
+    } catch (err) {
+      console.error(err);
+      alert("Upload failed.");
     }
+
+    setLoading(false);
+  };
+
+  return (
+    <ProtectedPage>
+      <Sidebar />
+      <Topbar />
+
+      <main className="ml-60 mt-16 p-8 text-white">
+        <h1
+          className="text-4xl font-bold mb-6"
+          style={{ color: currentArtist?.color || "white" }}
+        >
+          Upload Video
+        </h1>
+
+        <UploadDropzone onFilesSelected={setFiles} />
+
+        <button
+          onClick={submit}
+          disabled={loading}
+          className="mt-8 px-6 py-3 rounded bg-white text-black font-semibold hover:opacity-80 transition"
+        >
+          {loading ? status : "Upload"}
+        </button>
+      </main>
+    </ProtectedPage>
   );
-
-  if (!res.ok) throw new Error("Publishing failed.");
-  return await res.json();
-};
-
-// ---------------- ARTIST SETTINGS ----------------
-
-export const saveArtistSettings = async (artist, settings) => {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_GATEWAY_URL}/artists/settings`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ artist, ...settings }),
-    }
-  );
-
-  if (!res.ok) throw new Error("Unable to save artist settings.");
-  return await res.json();
-};
-
-// ---------------- VIDEO UPLOAD (NEW) ----------------
-
-export const uploadVideo = async (formData) => {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_GATEWAY_URL}/upload`,
-    {
-      method: "POST",
-      body: formData, // must NOT set headers manually
-    }
-  );
-
-  if (!res.ok) throw new Error("Video upload failed.");
-  return await res.json();
-};
+}
