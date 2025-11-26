@@ -1,73 +1,61 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 
 export default function LoginPage() {
-  const { login } = useAuth() || {};  // safe fallback
+  const { login, loading } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   const submit = async (e) => {
     e.preventDefault();
-    setError(null);
-    setLoading(true);
-
     try {
-      if (!login) throw new Error("Auth system not ready.");
       await login(email, password);
     } catch (err) {
-      setError(err.message);
+      alert("Invalid credentials");
     }
-
-    setLoading(false);
   };
 
   return (
-    <div className="flex items-center justify-center h-screen bg-black">
+    <main className="flex items-center justify-center h-screen bg-black text-white">
       <form
         onSubmit={submit}
-        className="bg-neutral-900 p-8 rounded-xl w-full max-w-md shadow-lg"
+        className="bg-zinc-900 p-10 rounded-2xl w-full max-w-sm shadow-xl"
       >
-        <h1 className="text-3xl font-bold mb-4 text-white text-center">
-          Wavemint Login
-        </h1>
+        <h1 className="text-3xl font-bold mb-6">Sign In</h1>
 
-        {error && (
-          <p className="text-red-500 text-sm mb-3 text-center">{error}</p>
-        )}
-
-        <label className="block mb-3 text-white">
-          Email
+        <label className="block mb-4">
+          <span className="opacity-70">Email</span>
           <input
             type="email"
-            className="w-full p-2 rounded bg-neutral-800 text-white border border-neutral-700 mt-1"
+            value={email}
             onChange={(e) => setEmail(e.target.value)}
+            className="w-full mt-2 p-3 rounded bg-zinc-800 border border-zinc-700"
+            required
           />
         </label>
 
-        <label className="block mb-3 text-white">
-          Password
+        <label className="block mb-6">
+          <span className="opacity-70">Password</span>
           <input
             type="password"
-            className="w-full p-2 rounded bg-neutral-800 text-white border border-neutral-700 mt-1"
+            value={password}
             onChange={(e) => setPassword(e.target.value)}
+            className="w-full mt-2 p-3 rounded bg-zinc-800 border border-zinc-700"
+            required
           />
         </label>
 
         <button
           type="submit"
-          disabled={loading}
-          className="w-full py-2 rounded bg-white text-black font-semibold mt-4 hover:opacity-80 transition"
+          className="w-full py-3 rounded bg-white text-black font-semibold hover:opacity-80 transition"
         >
-          {loading ? "Logging in..." : "Login"}
+          {loading ? "Signing in..." : "Login"}
         </button>
       </form>
-    </div>
+    </main>
   );
 }
+
