@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useState } from "react";
 import Sidebar from "@/components/Sidebar";
 import Topbar from "@/components/Topbar";
@@ -9,7 +11,7 @@ import { useArtist } from "@/context/ArtistContext";
 import { uploadVideo } from "@/utils/api";
 
 export default function UploadPage() {
-  const { currentArtist } = useArtist();
+  const { currentArtist } = useArtist() || {};
   const [files, setFiles] = useState({ video: null, audio: null });
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("");
@@ -19,16 +21,26 @@ export default function UploadPage() {
       alert("Please upload a video.");
       return;
     }
+
+    if (!currentArtist?.slug) {
+      alert("Artist not ready.");
+      return;
+    }
+
     setLoading(true);
     setStatus("Uploading...");
 
     try {
-      const res = await uploadVideo(files.video, files.audio, currentArtist.slug);
+      const res = await uploadVideo(
+        files.video,
+        files.audio,
+        currentArtist.slug
+      );
 
       setStatus("Processing...");
       console.log("Upload success:", res);
 
-      // Later: redirect to /clips/[jobId]
+      // Later: router.push(`/clips/${res.jobId}`);
     } catch (err) {
       console.error(err);
       alert("Upload failed.");
@@ -45,7 +57,7 @@ export default function UploadPage() {
       <main className="ml-60 mt-16 p-8 text-white">
         <h1
           className="text-4xl font-bold mb-6"
-          style={{ color: currentArtist.color }}
+          style={{ color: currentArtist?.color || "white" }}
         >
           Upload Video
         </h1>
