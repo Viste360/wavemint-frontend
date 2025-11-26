@@ -1,43 +1,27 @@
-<svg width="320" height="80" viewBox="0 0 320 80" xmlns="http://www.w3.org/2000/svg">
+<svg width="260" height="60" viewBox="0 0 260 60" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#00fff0"/>
-      <stop offset="50%" stop-color="#00cbe0"/>
-      <stop offset="100%" stop-color="#00fff0"/>
+    <linearGradient id="mintGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00FFF0"/>
+      <stop offset="100%" stop-color="#00AFAA"/>
     </linearGradient>
   </defs>
 
-  <!-- Waveform -->
-  <path 
-    d="M10 40 
-       Q30 10 50 40 
-       T90 40 
-       T130 40 
-       T170 40 
-       T210 40 
-       T250 40 
-       T290 40"
-    stroke="url(#waveGradient)"
-    stroke-width="5"
-    fill="none"
-    stroke-linecap="round"
-    opacity="0.95">
-    <animate attributeName="stroke-opacity"
-             values="0.5;1;0.5"
-             dur="2.5s"
-             repeatCount="indefinite"/>
-  </path>
+  <!-- Wave Icon -->
+  <path d="M10 30 Q20 10 30 30 T50 30 T70 30"
+        stroke="url(#mintGrad)"
+        stroke-width="5"
+        fill="none"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
 
-  <!-- Text -->
-  <text 
-    x="60"
-    y="70"
-    fill="white"
-    font-size="32"
-    font-weight="600"
-    font-family="Inter, sans-serif"
-    letter-spacing="4">
-    WAVEMINT
+  <!-- Wordmark -->
+  <text x="90" y="37" font-family="Inter, sans-serif" font-size="28" font-weight="700"
+        fill="white" letter-spacing="1.5">
+    WAVE
+  </text>
+
+  <text x="185" y="37" font-family="Inter, sans-serif" font-size="28" font-weight="700"
+        fill="url(#mintGrad)" letter-spacing="1.5">
+    MINT
   </text>
 </svg>
-
