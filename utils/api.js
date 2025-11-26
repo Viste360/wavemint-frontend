@@ -1,80 +1,70 @@
-"use client";
+// utils/api.js
 
-export const dynamic = "force-dynamic";
+// ---------------- CAPTIONS ----------------
+export const generateCaptions = async (clipId) => {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_GATEWAY_URL}/captions/generate`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ clipId }),
+  });
 
-import { useState } from "react";
-import Sidebar from "@/components/Sidebar";
-import Topbar from "@/components/Topbar";
-import ProtectedPage from "@/components/ProtectedPage";
-import UploadDropzone from "@/components/UploadDropzone";
-import { useArtist } from "@/context/ArtistContext";
-import { uploadVideo } from "@/utils/api";
+  if (!res.ok) throw new Error("Caption generation failed.");
+  return await res.json();
+};
 
-export default function UploadPage() {
-  const { currentArtist } = useArtist() || {};
-  const [files, setFiles] = useState({ video: null, audio: null });
-  const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState("");
+export const getCaptions = async (clipId) => {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_GATEWAY_URL}/captions/${clipId}`);
+  if (!res.ok) return null;
+  return await res.json();
+};
 
-  const submit = async () => {
-    if (!files.video) {
-      alert("Please upload a video.");
-      return;
-    }
 
-    if (!currentArtist?.slug) {
-      alert("Artist not ready.");
-      return;
-    }
+// ---------------- ARTWORK ----------------
+export const generateArtwork = async (clipId, artist) => {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_GATEWAY_URL}/artwork/generate`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ clipId, artist }),
+  });
 
-    setLoading(true);
-    setStatus("Uploading...");
+  if (!res.ok) throw new Error("Artwork generation failed.");
+  return await res.json();
+};
 
-    try {
-      // 🔥 Build FormData correctly
-      const formData = new FormData();
-      formData.append("video", files.video);
-      if (files.audio) formData.append("audio", files.audio);
-      formData.append("artist", currentArtist.slug);
 
-      const res = await uploadVideo(formData);
+// ---------------- PUBLISHING ----------------
+export const publishToPlatform = async (clipId, platform, artist) => {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_GATEWAY_URL}/publish/${platform}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ clipId, artist }),
+  });
 
-      setStatus("Processing...");
-      console.log("Upload success:", res);
+  if (!res.ok) throw new Error("Publishing failed.");
+  return await res.json();
+};
 
-      // Later: router.push(`/clips/${res.jobId}`);
 
-    } catch (err) {
-      console.error(err);
-      alert("Upload failed.");
-    }
+// ---------------- ARTIST SETTINGS ----------------
+export const saveArtistSettings = async (artist, settings) => {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_GATEWAY_URL}/artists/settings`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ artist, ...settings }),
+  });
 
-    setLoading(false);
-  };
+  if (!res.ok) throw new Error("Unable to save artist settings.");
+  return await res.json();
+};
 
-  return (
-    <ProtectedPage>
-      <Sidebar />
-      <Topbar />
 
-      <main className="ml-60 mt-16 p-8 text-white">
-        <h1
-          className="text-4xl font-bold mb-6"
-          style={{ color: currentArtist?.color || "white" }}
-        >
-          Upload Video
-        </h1>
+// ---------------- VIDEO UPLOAD ----------------
+export const uploadVideo = async (formData) => {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_GATEWAY_URL}/upload`, {
+    method: "POST",
+    body: formData, // IMPORTANT: no headers
+  });
 
-        <UploadDropzone onFilesSelected={setFiles} />
-
-        <button
-          onClick={submit}
-          disabled={loading}
-          className="mt-8 px-6 py-3 rounded bg-white text-black font-semibold hover:opacity-80 transition"
-        >
-          {loading ? status : "Upload"}
-        </button>
-      </main>
-    </ProtectedPage>
-  );
-}
+  if (!res.ok) throw new Error("Video upload failed.");
+  return await res.json();
+};
