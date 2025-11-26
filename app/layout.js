@@ -1,4 +1,4 @@
-import './globals.css';
+import "./globals.css";
 import { ArtistProvider } from "@/context/ArtistContext";
 import { AuthProvider } from "@/context/AuthContext";
 
