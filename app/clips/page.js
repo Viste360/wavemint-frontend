@@ -1,4 +1,5 @@
 "use client";
+export const dynamic = "force-dynamic";
 
 import { useEffect, useState } from "react";
 import Sidebar from "@/components/Sidebar";
@@ -12,7 +13,10 @@ export default function ClipsPage() {
   const [clips, setClips] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Prevent breaking before context loads
   useEffect(() => {
+    if (!currentArtist) return;
+
     const loadClips = async () => {
       try {
         const res = await fetch(
@@ -27,7 +31,9 @@ export default function ClipsPage() {
     };
 
     loadClips();
-  }, [currentArtist.slug]);
+  }, [currentArtist?.slug]);
+
+  if (!currentArtist) return null;
 
   return (
     <ProtectedPage>
