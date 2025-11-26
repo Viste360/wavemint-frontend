@@ -1,5 +1,6 @@
 import "./globals.css";
-import Providers from "./providers";
+import { ArtistProvider } from "@/context/ArtistContext";
+import { AuthProvider } from "@/context/AuthContext";
 
 export const metadata = {
   title: "Wavemint",
@@ -10,7 +11,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <Providers>{children}</Providers>
+        <AuthProvider>
+          <ArtistProvider>{children}</ArtistProvider>
+        </AuthProvider>
       </body>
     </html>
   );
